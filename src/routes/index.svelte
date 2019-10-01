@@ -1,46 +1,54 @@
-<style>
-	h1, figure, p {
-		text-align: center;
-		margin: 0 auto;
-	}
+<script>
+	import Menu from '../components/Menu.svelte';
 
-	h1 {
-		font-size: 2.8em;
-		text-transform: uppercase;
-		font-weight: 700;
-		margin: 0 0 0.5em 0;
-	}
+	const dataFile = 'data.json';
 
-	figure {
-		margin: 0 0 1em 0;
-	}
+	let promise = getData();
+	// let menuData;
 
-	img {
-		width: 100%;
-		max-width: 400px;
-		margin: 0 0 1em 0;
-	}
+    async function getData() {
+		const res = await fetch(dataFile);
+		const data = await res.json();
 
-	p {
-		margin: 1em auto;
-	}
-
-	@media (min-width: 480px) {
-		h1 {
-			font-size: 4em;
+		if (res.ok) {
+			return data;
+		} else {
+			throw new Error(data);
 		}
 	}
+</script>
+
+<style>
 </style>
 
-<svelte:head>
-	<title>Sapper project template</title>
-</svelte:head>
+<header class="masthead">
+	<div class="masthead__wrap">
+		<img class="masthead__logo" src="chill-out-logo.svg" alt="Chill Out Cafe Logo" />
+		<div class="masthead__subheading">Dine-In &#8226; Carry-Out &#8226; Delivery</div>
+		<a class="masthead__phone" href="&#116;&#101;&#108;:(&#053;&#048;&#052;)&#032;&#056;&#055;&#050;&#045;&#057;&#054;&#050;&#056;">(&#053;&#048;&#052;)&#032;&#056;&#055;&#050;&#045;&#057;&#054;&#050;&#056;</a>
+		<div class="masthead__address">729 Burdette St., New Orleans, LA 70118
+		</div>
+	</div>
+</header>
 
-<h1>Great success!</h1>
+<main class="main">
+	<h1 class="page-title visibly-hidden">Menu</h1>
+	<div class="main__decoration main__decoration--left" role="presentation">
+		<div class="main__decoration__inner"></div>
+	</div>
+	<div class="main__decoration main__decoration--right" role="presentation">
+		<div class="main__decoration__inner"></div>
+	</div>
 
-<figure>
-	<img alt='Borat' src='great-success.png'>
-	<figcaption>HIGH FIVE!</figcaption>
-</figure>
-
-<p><strong>Try editing this file (src/routes/index.svelte) to test live reloading.</strong></p>
+	{#await promise}
+		<p>...loading</p>
+	{:then menus}
+		{#each menus as menu}
+			<Menu {menu}/>
+		{:else}
+			<p class="error">No menus found!</p>
+		{/each}
+	{:catch error}
+		<p style="color: red">{error.message}</p>
+	{/await}
+</main>
